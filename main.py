@@ -1,6 +1,7 @@
 from google import genai
 from google.genai import types
 import config
+import random
  
 client = genai.Client(api_key=config.GEMINI_API_KEY)
 
@@ -15,7 +16,7 @@ class GeminiCartomante:
             system_instruction=config.CONTEXT
         )
 
-    def analisar_tiragem(self, entrada_usuario: str) -> str:
+    def gerar_resposta(self, entrada_usuario: str) -> str:
         response = self.client.models.generate_content(
             model=self.model,
             contents=entrada_usuario,
@@ -23,9 +24,25 @@ class GeminiCartomante:
         )
         return response.text
     
-
+    def calculo_amor(data_um="2006-02-06", data_dois="2006-03-29"):
+        return print(arcano_um)
+    
+    def tiragem(self, tipo):
+        if tipo == "amor":
+            prompt = f"Além dos seus conhecimentos base, você domina a tiragem de compatiblidade amorosa, tirei o arcano {arcano}, o que isto significa?"
+            self.gerar_resposta(prompt)
+        if tipo == "diario":
+            prompt = ""
+            self.gerar_resposta(prompt)
 
 assistente = GeminiCartomante(client=client)
 
-prompt = "Hoje tirei no meu tarot o tolo na tiragem diária"
-print(assistente.analisar_tiragem(prompt))
+texto = "2006-02-07"
+new_text = texto.replace("-", "")
+print(new_text)
+soma = 0
+for n in new_text:
+    soma = int(n) + soma
+
+arcano = soma
+print(arcano)
