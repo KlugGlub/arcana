@@ -1,5 +1,6 @@
 from google import genai
 from google.genai import types
+import google.genai.errors as genai_errors
 import config
 import random
 from datetime import datetime
@@ -18,12 +19,39 @@ class GeminiCartomante:
         )
 
     def gerar_resposta(self, entrada_usuario: str) -> str:
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=entrada_usuario,
-            config=self.default_config
-        )
-        return print(response.text)
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=entrada_usuario,
+                config=self.default_config
+            )
+            print(response.text)
+            return response.text
+        except genai_errors.ClientError as error:
+            debug_message = (
+                f"[CLIENT ERROR] status={getattr(error, 'status', None)} "
+                f"message={error.message}"
+            )
+            print(debug_message)
+            return debug_message
+        except genai_errors.ServerError as error:
+            debug_message = (
+                f"[SERVER ERROR] status={getattr(error, 'status', None)} "
+                f"message={error.message}"
+            )
+            print(debug_message)
+            return debug_message
+        except genai_errors.APIError as error:
+            debug_message = (
+                f"[API ERROR] status={getattr(error, 'status', None)} "
+                f"message={error.message}"
+            )
+            print(debug_message)
+            return debug_message
+        except Exception as error:
+            debug_message = f"[UNEXPECTED ERROR] {type(error).__name__}: {error}"
+            print(debug_message)
+            return debug_message
     
     def soma_digitos(self, n):
         soma = 0
@@ -63,4 +91,4 @@ class GeminiCartomante:
 
 assistente = GeminiCartomante(client=client)
 
-assistente.tiragem("amor")
+# assistente.tiragem("diario")
