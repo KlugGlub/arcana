@@ -1,5 +1,6 @@
 from google import genai
 from google.genai import types
+import google.genai.errors as genai_errors
 import config
 import random
 from datetime import datetime
@@ -18,12 +19,39 @@ class GeminiCartomante:
         )
 
     def gerar_resposta(self, entrada_usuario: str) -> str:
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=entrada_usuario,
-            config=self.default_config
-        )
-        return print(response.text)
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=entrada_usuario,
+                config=self.default_config
+            )
+            print(response.text)
+            return response.text
+        except genai_errors.ClientError as error:
+            debug_message = (
+                f"[CLIENT ERROR] status={getattr(error, 'status', None)} "
+                f"message={error.message}"
+            )
+            print(debug_message)
+            return debug_message
+        except genai_errors.ServerError as error:
+            debug_message = (
+                f"[SERVER ERROR] status={getattr(error, 'status', None)} "
+                f"message={error.message}"
+            )
+            print(debug_message)
+            return debug_message
+        except genai_errors.APIError as error:
+            debug_message = (
+                f"[API ERROR] status={getattr(error, 'status', None)} "
+                f"message={error.message}"
+            )
+            print(debug_message)
+            return debug_message
+        except Exception as error:
+            debug_message = f"[UNEXPECTED ERROR] {type(error).__name__}: {error}"
+            print(debug_message)
+            return debug_message
     
     def soma_digitos(self, n):
         soma = 0
@@ -54,14 +82,13 @@ class GeminiCartomante:
             data_um = self.obter_data_valida("Informe sua data de nascimento (DD/MM/AAAA): ")
             data_dois = self.obter_data_valida("Informe a data de nascimento da outra pessoa (DD/MM/AAAA):")
             arcano = self.calculo_amor(data_um, data_dois)
-            prompt = f"""Contexto (Não o explícite durante a sua resposta, sua resposta deve ser escrita sem o cita-lo): A compatibilidade amorosa é calculada pela soma dos dígitos dos arcanos das duas pessoas, então calcula o arcano de um,
-            calcula o arcano do outro e por fim soma o dígitos de cada arcano por exemplo: (2+2+1+2 = 7) o arcano 7 representa a compatibilidade amorosa das duas pessoas.
-            o resultado entre o meu arcano e o arcano da outra pessoa: {arcano}"""
+            prompt = f""" esta é uma tiragem de compatibilidade amorosa o resultado entre o meu arcano e o arcano da outra pessoa: {arcano}"""
             self.gerar_resposta(prompt)
         if tipo == "diario":
-            prompt = ""
+            arcano = random.randint(0, 21)
+            prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano}"""
             self.gerar_resposta(prompt)
 
 assistente = GeminiCartomante(client=client)
 
-assistente.tiragem("amor")
+# assistente.tiragem("diario")
