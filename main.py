@@ -54,12 +54,11 @@ class GeminiCartomante:
             data_um = self.obter_data_valida("Informe sua data de nascimento (DD/MM/AAAA): ")
             data_dois = self.obter_data_valida("Informe a data de nascimento da outra pessoa (DD/MM/AAAA):")
             arcano = self.calculo_amor(data_um, data_dois)
-            prompt = f"""Contexto (Não o explícite durante a sua resposta, sua resposta deve ser escrita sem o cita-lo): A compatibilidade amorosa é calculada pela soma dos dígitos dos arcanos das duas pessoas, então calcula o arcano de um,
-            calcula o arcano do outro e por fim soma o dígitos de cada arcano por exemplo: (2+2+1+2 = 7) o arcano 7 representa a compatibilidade amorosa das duas pessoas.
-            o resultado entre o meu arcano e o arcano da outra pessoa: {arcano}"""
+            prompt = f""" esta é uma tiragem de compatibilidade amorosa o resultado entre o meu arcano e o arcano da outra pessoa: {arcano}"""
             self.gerar_resposta(prompt)
         if tipo == "diario":
-            prompt = ""
+            arcano = random.randint(0, 21)
+            prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano}"""
             self.gerar_resposta(prompt)
 
 assistente = GeminiCartomante(client=client)
