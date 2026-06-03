@@ -1,14 +1,52 @@
 ﻿from database.conexao import get_connection
 from models.usuario import Usuario
 
-class UsuarioDAO:
+class UsuarioDAO(DAO):
     @staticmethod
-    def inserir(usuario):
+    def criar(usuario):
         conexao = get_connection()
         cursor = conexao.cursor()
 
         sql = "INSERT INTO tb_usuarios (nome, username, data_nascimento, senha) VALUES (%s, %s, %s, %s)"
         cursor.execute(sql, (usuario.nome, usuario.username, usuario.dataNascimento, usuario.senha))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+    @staticmethod
+    def ler(id):
+        conexao = get_connection()
+        cursor = conexao.cursor()
+
+        sql = "SELECT id, nome, username, data_nascimento FROM tb_usuarios WHERE id = %s"
+        cursor.execute(sql, (id,))
+        resultado = cursor.fetchone()
+
+        cursor.close()
+        conexao.close()
+
+        if resultado:
+            return Usuario(id=resultado[0], nome=resultado[1], username=resultado[2], dataNascimento=resultado[3])
+        return None
+
+    @staticmethod
+    def atualizar(usuario):
+        conexao = get_connection()
+        cursor = conexao.cursor()
+
+        sql = "UPDATE tb_usuarios SET nome = %s, username = %s, data_nascimento = %s, senha = %s WHERE id = %s"
+        cursor.execute(sql, (usuario.nome, usuario.username, usuario.dataNascimento, usuario.senha, usuario.id))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+    @staticmethod
+    def deletar(id):
+        conexao = get_connection()
+        cursor = conexao.cursor()
+
+        sql = "DELETE FROM tb_usuarios WHERE id = %s"
+        cursor.execute(sql, (id,))
         conexao.commit()
         cursor.close()
         conexao.close()

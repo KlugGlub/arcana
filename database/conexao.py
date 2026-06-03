@@ -1,9 +1,10 @@
 ﻿import mysql.connector
+import db_config
 
 def get_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="db_arcana"
+        host=db_config.HOST,
+        user=db_config.USER,
+        password=db_config.PASSWORD,
+        database=db_config.DB_NAME
     )
