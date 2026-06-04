@@ -1,16 +1,12 @@
 ﻿import bcrypt
-
+import re
 from datetime import datetime
+from dao.usuario_dao import UsuarioDAO
+from models.usuario import Usuario
 
-from dao.user_dao import insert, list_by_username
-from home import run_home
 
 
 def validar_data_nascimento(data_texto):
-    """
-    Valida se a data está no formato DD/MM/AAAA
-    e se representa uma data real.
-    """
 
     try:
         data = datetime.strptime(data_texto, "%d/%m/%Y").date()
@@ -36,6 +32,22 @@ def solicitar_data_nascimento():
         data_nascimento = validar_data_nascimento(data_texto)
 
     return data_nascimento
+
+def validar_email(email):
+    if not email:
+        return False
+
+    email = email.strip()
+
+    if " " in email:
+        return False
+
+    if ".." in email:
+        return False
+
+    padrao = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+    return re.match(padrao, email) is not None
 
 
 def run_login():
@@ -71,19 +83,19 @@ Escolha uma opção:
             usuario = None
 
             while usuario is None:
-                username = input("Informe seu nome de usuário: ")
-                resultado = list_by_username(username)
+                email = input("Informe seu email: ")
+                resultado = UsuarioDAO.procurar_por_email(email)
 
-                if len(resultado) == 0:
+                if resultado is None:
                     print("Usuário informado não existe.")
                 else:
-                    usuario = resultado[0]
+                    usuario = resultado
 
             senha = input("Informe a senha: ")
 
             password_matches = bcrypt.checkpw(
                 senha.encode("utf-8"),
-                usuario["senha"].encode("utf-8")
+                usuario.senha.encode("utf-8")
             )
 
             if password_matches:
@@ -92,28 +104,34 @@ Escolha uma opção:
                 print("Senha incorreta!")
 
         elif opc == 2:
-            usuario = {
-                "nome": None,
-                "username": None,
-                "senha": None,
-                "data_nascimento": None
-            }
+            usuario = Usuario(None, None, None, None)
 
-            usuario["nome"] = input("Informe o seu nome: ")
-            usuario["username"] = input("Informe seu nome de usuário: ")
+            usuario.nome = input("Informe o seu nome: ")
+            usuario.email = input("Informe seu email: ")
+    
+            while not validar_email(usuario.email):
+                print("Email inválido. Tente novamente.")
+                usuario.email = input("Informe seu email: ")
 
             senha = input("Informe a senha: ")
+            confirmacao_senha = input("Confirme a senha: ")
+
+            while senha != confirmacao_senha:
+                print("As senhas não coincidem. Tente novamente.")
+                senha = input("Informe a senha: ")
+                confirmacao_senha = input("Confirme a senha: ")
 
             hashed_password = bcrypt.hashpw(
                 senha.encode("utf-8"),
                 bcrypt.gensalt()
             )
 
-            usuario["senha"] = hashed_password.decode("utf-8")
+            usuario.senha = hashed_password.decode("utf-8")
 
             data_nascimento = solicitar_data_nascimento()
-            usuario["data_nascimento"] = data_nascimento.strftime("%Y-%m-%d")
+            usuario.dataNascimento = data_nascimento.strftime("%Y-%m-%d")
 
-            insert(usuario)
+            UsuarioDAO.criar(usuario)
 
             print("Usuário cadastrado com sucesso!")
+run_login()

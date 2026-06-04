@@ -5,7 +5,7 @@ use db_arcana;
 create table if not exists tb_usuarios(
 	id int unsigned primary key auto_increment,
     nome varchar(255) not null,
-    username varchar(30) not null unique,
+    email varchar(255) not null unique,
     senha varchar (255) not null,
     data_nascimento date not null
 );

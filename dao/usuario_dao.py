@@ -1,5 +1,6 @@
 ﻿from database.conexao import get_connection
 from models.usuario import Usuario
+from dao.dao import DAO
 
 class UsuarioDAO(DAO):
     @staticmethod
@@ -7,8 +8,8 @@ class UsuarioDAO(DAO):
         conexao = get_connection()
         cursor = conexao.cursor()
 
-        sql = "INSERT INTO tb_usuarios (nome, username, data_nascimento, senha) VALUES (%s, %s, %s, %s)"
-        cursor.execute(sql, (usuario.nome, usuario.username, usuario.dataNascimento, usuario.senha))
+        sql = "INSERT INTO tb_usuarios (nome, email, data_nascimento, senha) VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, (usuario.nome, usuario.email, usuario.dataNascimento, usuario.senha))
         conexao.commit()
         cursor.close()
         conexao.close()
@@ -18,7 +19,7 @@ class UsuarioDAO(DAO):
         conexao = get_connection()
         cursor = conexao.cursor()
 
-        sql = "SELECT id, nome, username, data_nascimento FROM tb_usuarios WHERE id = %s"
+        sql = "SELECT id, nome, email, data_nascimento FROM tb_usuarios WHERE id = %s"
         cursor.execute(sql, (id,))
         resultado = cursor.fetchone()
 
@@ -26,7 +27,7 @@ class UsuarioDAO(DAO):
         conexao.close()
 
         if resultado:
-            return Usuario(id=resultado[0], nome=resultado[1], username=resultado[2], dataNascimento=resultado[3])
+            return Usuario(id=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3])
         return None
 
     @staticmethod
@@ -34,8 +35,8 @@ class UsuarioDAO(DAO):
         conexao = get_connection()
         cursor = conexao.cursor()
 
-        sql = "UPDATE tb_usuarios SET nome = %s, username = %s, data_nascimento = %s, senha = %s WHERE id = %s"
-        cursor.execute(sql, (usuario.nome, usuario.username, usuario.dataNascimento, usuario.senha, usuario.id))
+        sql = "UPDATE tb_usuarios SET nome = %s, email = %s, data_nascimento = %s, senha = %s WHERE id = %s"
+        cursor.execute(sql, (usuario.nome, usuario.email, usuario.dataNascimento, usuario.senha, usuario.id))
         conexao.commit()
         cursor.close()
         conexao.close()
@@ -50,4 +51,19 @@ class UsuarioDAO(DAO):
         conexao.commit()
         cursor.close()
         conexao.close()
+
+    def procurar_por_email(email):
+        conexao = get_connection()
+        cursor = conexao.cursor()
+
+        sql = "SELECT id, nome, email, data_nascimento, senha FROM tb_usuarios WHERE email = %s"
+        cursor.execute(sql, (email,))
+        resultado = cursor.fetchone()
+
+        cursor.close()
+        conexao.close()
+
+        if resultado:
+            return Usuario(id=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3], senha=resultado[4])
+        return None
 
