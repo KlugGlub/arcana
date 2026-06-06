@@ -1,5 +1,6 @@
 ﻿import bcrypt
 import re
+from main import run_main
 from datetime import datetime
 from dao.usuario_dao import UsuarioDAO
 from models.usuario import Usuario
@@ -83,35 +84,53 @@ Escolha uma opção:
             usuario = None
 
             while usuario is None:
-                email = input("Informe seu email: ")
-                resultado = UsuarioDAO.procurar_por_email(email)
+                email = input("Informe seu email (digite Voltar para retornar ao menu principal): ")
+                if email.lower() == "voltar":
+                    break
+                senha = input("Informe a senha: ")
+
+                try:
+                    resultado = UsuarioDAO.procurar_por_email(email)
+                except Exception as e:
+                    print(f"Erro ao procurar usuário: {e}")
+                    break
 
                 if resultado is None:
-                    print("Usuário informado não existe.")
+                    print("Credenciais inválidas. Tente novamente.")
                 else:
                     usuario = resultado
+                    password_matches = bcrypt.checkpw(
+                        senha.encode("utf-8"),
+                        usuario.senha.encode("utf-8")
+                    )
 
-            senha = input("Informe a senha: ")
-
-            password_matches = bcrypt.checkpw(
-                senha.encode("utf-8"),
-                usuario.senha.encode("utf-8")
-            )
-
-            if password_matches:
-                run_home(usuario)
-            else:
-                print("Senha incorreta!")
+                    if password_matches:
+                        run_main(usuario)
+                    else:
+                        print("Credenciais inválidas. Tente novamente.")
+                        usuario = None
 
         elif opc == 2:
             usuario = Usuario(None, None, None, None)
 
             usuario.nome = input("Informe o seu nome: ")
-            usuario.email = input("Informe seu email: ")
-    
-            while not validar_email(usuario.email):
-                print("Email inválido. Tente novamente.")
-                usuario.email = input("Informe seu email: ")
+            while True:
+                email = input("Informe seu email: ").strip()
+
+                if not validar_email(email):
+                    print("Email inválido. Tente novamente.")
+                    continue
+
+                try:
+                    if UsuarioDAO.procurar_por_email(email) is not None:
+                        print("Este e-mail já está cadastrado. Tente outro.")
+                        continue
+                except Exception as e:
+                    print(f"Erro ao verificar email: {e}")
+                    continue
+
+                usuario.email = email
+                break
 
             senha = input("Informe a senha: ")
             confirmacao_senha = input("Confirme a senha: ")

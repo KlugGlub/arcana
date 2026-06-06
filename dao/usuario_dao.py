@@ -15,7 +15,7 @@ class UsuarioDAO(DAO):
         conexao.close()
 
     @staticmethod
-    def ler(id):
+    def procurar_por_id(id):
         conexao = get_connection()
         cursor = conexao.cursor()
 
@@ -27,7 +27,7 @@ class UsuarioDAO(DAO):
         conexao.close()
 
         if resultado:
-            return Usuario(id=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3])
+            return Usuario(id_usuario=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3])
         return None
 
     @staticmethod
@@ -64,6 +64,6 @@ class UsuarioDAO(DAO):
         conexao.close()
 
         if resultado:
-            return Usuario(id=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3], senha=resultado[4])
+            return Usuario(id_usuario=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3], senha=resultado[4])
         return None
 

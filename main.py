@@ -3,6 +3,7 @@ from google.genai import types
 import google.genai.errors as genai_errors
 import config
 import random
+from models.usuario import Usuario
 from datetime import datetime
 
 client = genai.Client(api_key=config.GEMINI_API_KEY)
@@ -89,6 +90,11 @@ class GeminiCartomante:
             prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano}"""
             self.gerar_resposta(prompt)
 
-assistente = GeminiCartomante(client=client)
 
-# assistente.tiragem("diario")
+def run_main(usuario: Usuario):
+    pass
+    # try:
+    #     assistente = GeminiCartomante(client=client)
+    #     assistente.tiragem("diario")
+    # except Exception as e:
+    #     print(f"Erro ao realizar tiragem: {e}")
