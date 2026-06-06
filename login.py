@@ -4,8 +4,6 @@ from datetime import datetime
 from dao.usuario_dao import UsuarioDAO
 from models.usuario import Usuario
 
-
-
 def validar_data_nascimento(data_texto):
 
     try:
