@@ -1,6 +1,5 @@
 ﻿import bcrypt
 import re
-from main import run_main
 from datetime import datetime
 from dao.usuario_dao import UsuarioDAO
 from models.usuario import Usuario
@@ -78,7 +77,7 @@ Escolha uma opção:
                 opc = -1
 
         if opc == 0:
-            print("Encerrando...")
+            return None
 
         elif opc == 1:
             usuario = None
@@ -105,7 +104,7 @@ Escolha uma opção:
                     )
 
                     if password_matches:
-                        run_main(usuario)
+                        return usuario
                     else:
                         print("Credenciais inválidas. Tente novamente.")
                         usuario = None
@@ -153,4 +152,3 @@ Escolha uma opção:
             UsuarioDAO.criar(usuario)
 
             print("Usuário cadastrado com sucesso!")
-run_login()
