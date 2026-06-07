@@ -1,8 +1,7 @@
 ﻿from models.leitura_cartas import LeituraCartas
-from dao.dao import DAO
 from database.conexao import get_connection
 
-class LeituraCartasDAO(DAO):
+class LeituraCartasDAO():
     @staticmethod
     def criar(leitura: LeituraCartas):
         conexao = get_connection()

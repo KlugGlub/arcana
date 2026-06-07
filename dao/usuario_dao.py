@@ -1,8 +1,7 @@
 ﻿from database.conexao import get_connection
 from models.usuario import Usuario
-from dao.dao import DAO
 
-class UsuarioDAO(DAO):
+class UsuarioDAO():
     @staticmethod
     def criar(usuario):
         conexao = get_connection()

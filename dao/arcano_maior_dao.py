@@ -1,8 +1,7 @@
 ﻿from database.conexao import get_connection
 from models.arcano_maior import ArcanoMaior
-from dao.dao import DAO
 
-class ArcanoMaiorDAO(DAO):
+class ArcanoMaiorDAO():
     @staticmethod
     def buscar_por_numero(numero):
         conexao = get_connection()

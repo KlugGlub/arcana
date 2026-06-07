@@ -1,8 +1,7 @@
 ﻿from models.leitura import Leitura
-from dao.dao import DAO
 from database.conexao import get_connection
 
-class LeituraDAO(DAO):
+class LeituraDAO():
     @staticmethod
     def criar(leitura: Leitura):
         conexao = get_connection()

@@ -1,8 +1,7 @@
 ﻿from models.leitura_comp_amorosa import LeituraCompatibilidadeAmorosa
-from dao.dao import DAO
 from database.conexao import get_connection
 
-class LeituraCompatibilidadeAmorosaDAO(DAO):
+class LeituraCompatibilidadeAmorosaDAO():
     @staticmethod
     def criar(leitura: LeituraCompatibilidadeAmorosa):
         conexao = get_connection()
