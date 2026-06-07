@@ -7,7 +7,9 @@ from datetime import datetime
 from dao.arcano_maior_dao import ArcanoMaiorDAO
 from dao.leitura_comp_amorosa_dao import LeituraCompatibilidadeAmorosaDAO
 from dao.leitura_dao import LeituraDAO
+from dao.leitura_cartas_dao import LeituraCartasDAO
 from models.leitura_comp_amorosa import LeituraCompatibilidadeAmorosa
+from models.leitura_cartas import LeituraCartas
 
 class GeminiCartomante:
     def __init__(self, model: str = "gemini-3.5-flash"):
@@ -116,4 +118,17 @@ class GeminiCartomante:
             arcano = ArcanoMaiorDAO.buscar_por_numero(random.randint(0, 21))
             prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano.__str__()}"""
             print("Carregando resposta...")
-            self.gerar_resposta(prompt)
+            resposta = self.gerar_resposta(prompt).encode('utf-8')
+            leitura = LeituraCartas(
+                data_leitura=datetime.now(), 
+                resultado=resposta, 
+                usuario=usuario, 
+                tipo_tiragem="tiragem do dia", 
+                carta=arcano, 
+                pergunta="Tiragem diária")
+
+            try:
+                leitura.id_leitura = LeituraDAO.criar(leitura)
+                LeituraCartasDAO.criar(leitura)
+            except Exception as e:
+                print(f"Erro ao salvar leitura: {e}")
