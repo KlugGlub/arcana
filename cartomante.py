@@ -5,6 +5,9 @@ import config
 import random
 from datetime import datetime
 from dao.arcano_maior_dao import ArcanoMaiorDAO
+from dao.leitura_comp_amorosa_dao import LeituraCompatibilidadeAmorosaDAO
+from dao.leitura_dao import LeituraDAO
+from models.leitura_comp_amorosa import LeituraCompatibilidadeAmorosa
 
 class GeminiCartomante:
     def __init__(self, model: str = "gemini-3.5-flash"):
@@ -58,16 +61,20 @@ class GeminiCartomante:
             soma = int(num) + soma
         return ArcanoMaiorDAO.buscar_por_numero(soma)
     
-    def calculo_amor(self, data_um="2006-02-06", data_dois="2006-03-29"):
+    def calculo_amor(self, data_um, data_dois):
+        lista_arcanos = []
         data_um_format = data_um.strip().replace("/","")
         arcano_um = self.calcular_arcano(data_um_format)
+        lista_arcanos.append(arcano_um)
         print(f"Seu arcano é: {arcano_um.nome}")
         data_dois_format = data_dois.strip().replace("/","")
         arcano_dois = self.calcular_arcano(data_dois_format)
+        lista_arcanos.append(arcano_dois)
         print(f"O arcano da outra pessoa é: {arcano_dois.nome}")
         arcano_compatibilidade_format = str(arcano_um.numero) + str(arcano_dois.numero)
         arcano_compatibilidade = self.calcular_arcano(arcano_compatibilidade_format)
-        return arcano_compatibilidade
+        lista_arcanos.append(arcano_compatibilidade)
+        return lista_arcanos
     
     def obter_data_valida(self, mensagem):
         while True:
@@ -82,11 +89,29 @@ class GeminiCartomante:
         if tipo == "amor":
             data_um = usuario.dataNascimento.strftime("%d/%m/%Y")
             print(f"Data de nascimento do usuário: {data_um}")
+            parceiro = input("Informe o nome do(a) parceiro(a): ")
             data_dois = self.obter_data_valida("Informe a data de nascimento da outra pessoa (DD/MM/AAAA):")
-            arcano = self.calculo_amor(data_um, data_dois)
-            prompt = f""" esta é uma tiragem de compatibilidade amorosa o resultado entre o meu arcano e o arcano da outra pessoa, aqui estão os detalhes do arcano resolvido: {arcano.__str__()}"""
+            lista_arcanos = self.calculo_amor(data_um, data_dois)
+            prompt = f""" esta é uma tiragem de compatibilidade amorosa o resultado entre o meu arcano e o arcano da outra pessoa, aqui estão os detalhes do arcano resolvido: {lista_arcanos[2].__str__()}"""
             print("Carregando resposta...")
-            self.gerar_resposta(prompt)
+            resposta = self.gerar_resposta(prompt).encode('utf-8')
+            leitura = LeituraCompatibilidadeAmorosa(
+                data_leitura=datetime.now(), 
+                resultado=resposta, 
+                usuario=usuario, 
+                carta_usuario=lista_arcanos[0], 
+                carta_parceiro=lista_arcanos[1], 
+                carta_resultado=lista_arcanos[2], 
+                nome_parceiro=parceiro, 
+                data_nascimento_parceiro=datetime.strptime(data_dois, "%d/%m/%Y").strftime("%Y-%m-%d"), 
+                pergunta=f"Compatibilidade amorosa entre {data_um} e {data_dois}")
+
+            try:
+                leitura.id_leitura = LeituraDAO.criar(leitura)
+                LeituraCompatibilidadeAmorosaDAO.criar(leitura)
+            except Exception as e:
+                print(f"Erro ao salvar leitura: {e}")
+
         if tipo == "diario":
             arcano = ArcanoMaiorDAO.buscar_por_numero(random.randint(0, 21))
             prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano.__str__()}"""
