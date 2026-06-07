@@ -21,7 +21,7 @@ create table if not exists tb_cartas(
 create table if not exists tb_arcanos_maiores(
 	id_carta int unsigned primary key,
     jornada tinyint not null,
-    arquétipo varchar(255) not null,
+    arquetipo varchar(255) not null,
     constraint cartas_arcanos_maiores foreign key (id_carta) references tb_cartas(id)
 );
 

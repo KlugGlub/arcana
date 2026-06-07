@@ -4,7 +4,7 @@ import google.genai.errors as genai_errors
 import config
 import random
 from datetime import datetime
-
+from dao.arcano_maior_dao import ArcanoMaiorDAO
 
 class GeminiCartomante:
     def __init__(self, model: str = "gemini-3.5-flash"):
@@ -52,19 +52,21 @@ class GeminiCartomante:
             print(debug_message)
             return debug_message
     
-    def soma_digitos(self, n):
+    def calcular_arcano(self, n):
         soma = 0
         for num in n:
             soma = int(num) + soma
-        return soma
+        return ArcanoMaiorDAO.buscar_por_numero(soma)
     
     def calculo_amor(self, data_um="2006-02-06", data_dois="2006-03-29"):
         data_um_format = data_um.strip().replace("/","")
-        arcano_um = self.soma_digitos(data_um_format)
+        arcano_um = self.calcular_arcano(data_um_format)
+        print(f"Seu arcano é: {arcano_um.nome}")
         data_dois_format = data_dois.strip().replace("/","")
-        arcano_dois = self.soma_digitos(data_dois_format)
-        arcano_compatibilidade_format = str(arcano_um) + str(arcano_dois)
-        arcano_compatibilidade = self.soma_digitos(arcano_compatibilidade_format)
+        arcano_dois = self.calcular_arcano(data_dois_format)
+        print(f"O arcano da outra pessoa é: {arcano_dois.nome}")
+        arcano_compatibilidade_format = str(arcano_um.numero) + str(arcano_dois.numero)
+        arcano_compatibilidade = self.calcular_arcano(arcano_compatibilidade_format)
         return arcano_compatibilidade
     
     def obter_data_valida(self, mensagem):
@@ -76,16 +78,17 @@ class GeminiCartomante:
             except ValueError:
                 print("❌ Formato inválido ou data inexistente! Por favor, use o formato DD/MM/AAAA (ex: 06/02/2006).")
 
-    def tiragem(self, tipo):
+    def tiragem(self, usuario, tipo):
         if tipo == "amor":
-            data_um = self.obter_data_valida("Informe sua data de nascimento (DD/MM/AAAA): ")
+            data_um = usuario.dataNascimento.strftime("%d/%m/%Y")
+            print(f"Data de nascimento do usuário: {data_um}")
             data_dois = self.obter_data_valida("Informe a data de nascimento da outra pessoa (DD/MM/AAAA):")
             arcano = self.calculo_amor(data_um, data_dois)
-            prompt = f""" esta é uma tiragem de compatibilidade amorosa o resultado entre o meu arcano e o arcano da outra pessoa: {arcano}"""
+            prompt = f""" esta é uma tiragem de compatibilidade amorosa o resultado entre o meu arcano e o arcano da outra pessoa, aqui estão os detalhes do arcano resolvido: {arcano.__str__()}"""
             print("Carregando resposta...")
             self.gerar_resposta(prompt)
         if tipo == "diario":
-            arcano = random.randint(0, 21)
-            prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano}"""
+            arcano = ArcanoMaiorDAO.buscar_por_numero(random.randint(0, 21))
+            prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano.__str__()}"""
             print("Carregando resposta...")
             self.gerar_resposta(prompt)
