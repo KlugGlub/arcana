@@ -10,4 +10,4 @@ class Leitura:
         self.pergunta = pergunta
 
     def __str__(self):
-        return f"Leitura: {self.tipo_tiragem} (Data: {self.data_leitura}, Resultado: {self.resultado}, Usuário: {self.usuario.nome})"
+        return f"Leitura: {self.tipo_tiragem}\nData: {self.data_leitura}\nResultado: {self.resultado}\nPergunta: {self.pergunta}\nUsuário: {self.usuario.nome}"

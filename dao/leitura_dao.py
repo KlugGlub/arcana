@@ -19,12 +19,12 @@ class LeituraDAO():
         return id_leitura
 
     @staticmethod
-    def procurar_por_usuario(id_usuario):
+    def procurar_por_usuario(usuario):
         conexao = get_connection()
         cursor = conexao.cursor()
 
-        sql = "SELECT id, tipo_tiragem, data_leitura, resultado, pergunta FROM tb_leituras WHERE id_usuario = %s"
-        cursor.execute(sql, (id_usuario,))
+        sql = "SELECT l.id, l.tipo_tiragem, l.data_leitura, l.resultado, l.pergunta FROM tb_leituras l WHERE l.id_usuario = %s"
+        cursor.execute(sql, (usuario.id_usuario,))
         resultados = cursor.fetchall()
 
         cursor.close()
@@ -32,7 +32,7 @@ class LeituraDAO():
 
         leituras = []
         for resultado in resultados:
-            leitura = Leitura(id_leitura=resultado[0], tipo_tiragem=resultado[1], data_leitura=resultado[2], resultado=resultado[3], usuario=None, pergunta=resultado[4])
+            leitura = Leitura(id_leitura=resultado[0], tipo_tiragem=resultado[1], data_leitura=resultado[2], resultado=resultado[3].decode('utf-8'), usuario=usuario, pergunta=resultado[4].decode('utf-8'))
             leituras.append(leitura)
         
         return leituras
