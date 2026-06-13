@@ -63,8 +63,7 @@ class GeminiCartomante:
             soma = int(num) + soma
 
         if soma > 22:
-            soma = self.calcular_arcano(str(soma))
-        
+            return self.calcular_arcano(str(soma))
 
         return ArcanoMaiorDAO.buscar_por_numero(soma)
     

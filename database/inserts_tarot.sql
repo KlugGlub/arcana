@@ -106,7 +106,7 @@ INSERT INTO tb_arcanos_maiores (id_carta, jornada, arquetipo) VALUES
 (20, 19, 'A vitalidade'),
 (21, 20, 'O chamado do despertar'),
 (22, 21, 'A integração final'),
-(79, 22, 'O viajante livre');
+(23, 22, 'O viajante livre');
 
 INSERT INTO tb_arcanos_menores (id_carta, naipe) VALUES
 (23, 'Paus'),
