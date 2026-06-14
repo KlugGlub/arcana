@@ -1,4 +1,5 @@
 ﻿from dao.arcano_maior_dao import ArcanoMaiorDAO
+import random
 
 class LeituraService:
     @staticmethod
@@ -8,7 +9,7 @@ class LeituraService:
             soma = int(num) + soma
 
         if soma > 22:
-            return self.calcular_arcano(str(soma))
+            return LeituraService.calcular_arcano(str(soma))
 
         return ArcanoMaiorDAO.buscar_por_numero(soma)
     
@@ -31,3 +32,8 @@ class LeituraService:
         except ValueError:
             raise ValueError("Erro na leitura.")
         return lista_arcanos
+
+    @staticmethod
+    def sortear_arcano():
+        return ArcanoMaiorDAO.buscar_por_numero(random.randint(0, 22))
+

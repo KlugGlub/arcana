@@ -8,6 +8,29 @@ interface LoginProps {
   onLogin: (nome: string) => void;
 }
 
+const hoje = new Date().toISOString().split("T")[0];
+
+const dataEhValida = (data: string) => {
+  if (!data) {
+    return false;
+  }
+
+  const dataInformada = new Date(data + "T00:00:00");
+  const hoje = new Date();
+
+  hoje.setHours(0, 0, 0, 0);
+
+  if (Number.isNaN(dataInformada.getTime())) {
+    return false;
+  }
+
+  if (dataInformada > hoje) {
+    return false;
+  }
+
+  return true;
+};
+
 const Login = ({ onLogin }: LoginProps) => {
   const [isSignup, setIsSignup] = useState(false);
   const [nome, setNome] = useState("");
@@ -18,8 +41,15 @@ const Login = ({ onLogin }: LoginProps) => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const usuario = new Usuario(nome, email, data_nascimento, senha);
+
+    
+
+    const usuario = new Usuario(email, senha, nome, data_nascimento);
     if(isSignup) {
+      if (!dataEhValida(data_nascimento)) {
+      alert("A data da primeira pessoa é inválida ou está no futuro.");
+      return;
+    }
       const resposta = await fetch("http://localhost:8000/api/cadastro", {
         method: "POST",
         headers: {
@@ -33,7 +63,7 @@ const Login = ({ onLogin }: LoginProps) => {
         alert(dados.message);
         setIsSignup(false);
       } else {
-        alert("Erro no cadastro: " + dados.msg);
+        alert(dados.detail);
       }
     }else{
       const usuario = new Usuario(email, senha);
@@ -46,7 +76,6 @@ const Login = ({ onLogin }: LoginProps) => {
       });
       const dados = await resposta.json();
       if(resposta.ok) {
-        alert(dados.message);
         setIsSignup(false);
         onLogin(dados.usuario.nome);
         localStorage.setItem("usuario", JSON.stringify({
@@ -56,10 +85,9 @@ const Login = ({ onLogin }: LoginProps) => {
         }));
         navigate("/");
       } else {
-        alert("Erro no login: " + dados.message);
+        alert(dados.detail);
       }
     }
-    // const displayNome = isSignup ? nome : email.split("@")[0];
     
   };
 
@@ -93,6 +121,7 @@ const Login = ({ onLogin }: LoginProps) => {
                 <input
                   type="date"
                   value={data_nascimento}
+                  max={hoje}
                   onChange={(e) => setDataNascimento(e.target.value)}
                   required={isSignup}
                   className="w-full rounded-lg border border-border bg-muted/30 px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"

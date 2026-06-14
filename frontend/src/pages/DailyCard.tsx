@@ -1,21 +1,28 @@
 import { useState } from "react";
-import { getRandomCard, TarotCard } from "@/data/tarotCards";
 import tarotCardDesign from "@/assets/tarot-card-design.png";
 import StarField from "@/components/StarField";
+import { ArcanoMaior } from "@/model/arcanoMaior";
 
 const DailyCard = () => {
-  const [card, setCard] = useState<TarotCard | null>(null);
+  const [carta, setCard] = useState<ArcanoMaior | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const [leitura, setLeitura] = useState("");
 
-  const drawCard = () => {
+  const drawCard = async () => {
     setIsRevealing(true);
+    const resposta = await fetch("http://localhost:8000/api/tiragemDiaria", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }});
+
+    const dados = await resposta.json();
+    setCard(dados.arcano)
+    setLeitura(dados.leitura)
     setRevealed(false);
-    setTimeout(() => {
-      setCard(getRandomCard());
-      setRevealed(true);
-      setIsRevealing(false);
-    }, 1500);
+    setRevealed(true);
+    setIsRevealing(false);
   };
 
   return (
@@ -44,18 +51,18 @@ const DailyCard = () => {
           </div>
         )}
 
-        {revealed && card && (
+        {revealed && carta && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="mx-auto max-w-sm rounded-2xl border border-accent/30 bg-card/60 p-8 backdrop-blur-md glow-gold">
               <img
                 src={tarotCardDesign}
-                alt={card.name}
+                alt={carta.nome}
                 className="mx-auto h-48 w-auto mb-4 rounded-lg"
               />
-              <p className="text-sm text-muted-foreground mb-1">Arcano {card.id}</p>
-              <h2 className="font-heading text-2xl text-accent mb-4">{card.name}</h2>
+              <p className="text-sm text-muted-foreground mb-1">Arcano {carta.numero}</p>
+              <h2 className="font-heading text-2xl text-accent mb-4">{carta.nome}</h2>
               <div className="flex flex-wrap justify-center gap-2 mb-4">
-                {card.keywords.map((kw) => (
+                {carta.palavra_chave.split(",").map((kw) => (
                   <span
                     key={kw}
                     className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-lavender"
@@ -64,8 +71,8 @@ const DailyCard = () => {
                   </span>
                 ))}
               </div>
-              <p className="text-foreground/80 mb-4 italic">"{card.message}"</p>
-              <p className="text-sm text-muted-foreground">{card.meaning}</p>
+              <p className="text-foreground/80 mb-4 italic">"{leitura}"</p>
+              <p className="text-sm text-muted-foreground">{carta.arquetipo}</p>
             </div>
             <button
               onClick={() => { setRevealed(false); setCard(null); }}

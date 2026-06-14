@@ -2,7 +2,6 @@ from google import genai
 from google.genai import types
 import google.genai.errors as genai_errors
 import config
-import random
 from datetime import datetime
 from dao.arcano_maior_dao import ArcanoMaiorDAO
 from dao.leitura_comp_amorosa_dao import LeituraCompatibilidadeAmorosaDAO
@@ -89,22 +88,9 @@ Trate o futuro como tendência comportamental, nunca como previsão certa.
 """
         return self.gerar_resposta(prompt)
 
-    def tiragem(self, usuario, tipo):
-        if tipo == "diario":
-            arcano = ArcanoMaiorDAO.buscar_por_numero(random.randint(0, 21))
-            prompt = f""" esta é uma tiragem diária o arcano tirado é: {arcano.__str__()}"""
-            print("Carregando resposta...")
-            resposta = self.gerar_resposta(prompt).encode('utf-8')
-            leitura = LeituraCartas(
-                data_leitura=datetime.now(), 
-                resultado=resposta, 
-                usuario=usuario, 
-                tipo_tiragem="tiragem do dia", 
-                carta=arcano, 
-                pergunta="Tiragem diária")
-
-            try:
-                leitura.id_leitura = LeituraDAO.criar(leitura)
-                LeituraCartasDAO.criar(leitura)
-            except Exception as e:
-                print(f"Erro ao salvar leitura: {e}")
+    def tiragem_diaria(self, arcano):
+        prompt = f""" esta é uma tiragem diária baseada no CENÁRIO B.
+Arcano resultante:
+{arcano.__str__()}
+"""
+        return self.gerar_resposta(prompt)

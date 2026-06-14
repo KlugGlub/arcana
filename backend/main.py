@@ -7,12 +7,10 @@ from api.compatibilidade_req import CompatibilidadeReq
 from models.usuario import Usuario
 from services.usuario_service import UsuarioService
 from services.leitura_service import LeituraService
-from historico_leituras import historico_leituras
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException
 bot = cartomante.GeminiCartomante()
 app = FastAPI()
-
-# usuario = run_login()
 
 origins = [
 "http://localhost:8080",
@@ -41,8 +39,15 @@ def cadastrar_usuario(usuario_cadastro_req: UsuarioCadastroReq):
     try:
         UsuarioService.cadastrar_usuario(usuario)
     except ValueError as ve:
-        return {"status": "error", "message": str(ve)}
-
+        raise HTTPException(
+            status_code=401,
+            detail=str(ve)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao realizar login: {e}"
+        )
 
     return {"status": "ok", "message": f"Usuário {usuario.nome} cadastrado com sucesso!"}
 
@@ -51,9 +56,16 @@ def login(usuario_login_req: UsuarioLoginReq):
     try:
         resultado = UsuarioService.login(usuario_login_req.email, usuario_login_req.senha)
     except ValueError as ve:
-        return {"status": "error", "message": str(ve)}
+        raise HTTPException(
+            status_code=401,
+            detail=str(ve)
+        )
+
     except Exception as e:
-        return {"status": "error", "message": f"Erro ao realizar login: {e}"}
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao realizar login: {e}"
+        )
     if resultado is not None:
         return {"status": "ok", "message": "Login realizado com sucesso!", "usuario": resultado}
 
@@ -67,3 +79,14 @@ def calcular_compatibilidade(compatibilidade_req: CompatibilidadeReq):
         return {"status": "error", "message": str(ve)}
 
     return {"status": "ok", "lista_arcanos": [arcano.to_dict() for arcano in resultado], "interacao": cartomante_interacao, "futuro": cartomante_futuro}
+
+@app.get("/api/tiragemDiaria")
+def sortear_carta():
+    try:
+        resultado = LeituraService.sortear_arcano()
+        leitura = bot.tiragem_diaria(resultado)
+        pass
+    except ValueError as ve:
+        return {"status": "error", "message": str(ve)}
+
+    return {"status": "ok", "arcano": resultado, "leitura": leitura}
