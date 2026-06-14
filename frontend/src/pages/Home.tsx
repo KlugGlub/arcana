@@ -125,7 +125,7 @@ const Home = () => {
             Projeto desenvolvido com ✦ por estudantes universitários apaixonados por tecnologia e misticismo.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {["Dev 1", "Dev 2", "Dev 3", "Dev 4"].map((dev) => (
+            {["Arthur Santos", "Gustavo Klug", "João Garcez", "Julia Costa", "Rafaela Ritter", "Stéfani Chaves"].map((dev) => (
               <div
                 key={dev}
                 className="rounded-xl border border-border bg-card/30 p-4 backdrop-blur-sm"
