@@ -3,8 +3,10 @@ import time
 from fastapi import FastAPI
 from api.usuario_cadastro_req import UsuarioCadastroReq
 from api.usuario_login_req import UsuarioLoginReq
+from api.compatibilidade_req import CompatibilidadeReq
 from models.usuario import Usuario
 from services.usuario_service import UsuarioService
+from services.leitura_service import LeituraService
 from historico_leituras import historico_leituras
 from fastapi.middleware.cors import CORSMiddleware
 bot = cartomante.GeminiCartomante()
@@ -55,19 +57,13 @@ def login(usuario_login_req: UsuarioLoginReq):
     if resultado is not None:
         return {"status": "ok", "message": "Login realizado com sucesso!", "usuario": resultado}
 
-    # if usuario is None:
-    #     print("Encerrando o programa. Até mais!")
-    #     time.sleep(2)
-    # else:
-    #     print(f"Olá, {usuario.nome}!")
-    #     while True:
-    #         entrada_usuario = input("\n Digite 1 para tiragem de amor, 2 para tiragem diária, 3 para histórico de leituras ou 'sair' para encerrar: ")
-    #         if entrada_usuario.lower().strip() == "sair":
-    #             print("Encerrando o programa. Até mais!")
-    #             break
-    #         if entrada_usuario == "1":
-    #             bot.tiragem(usuario, "amor")
-    #         elif entrada_usuario == "2":
-    #             bot.tiragem(usuario, "diario")
-    #         elif entrada_usuario == "3":
-    #             historico_leituras(usuario)
+@app.post("/api/compatibilidade")
+def calcular_compatibilidade(compatibilidade_req: CompatibilidadeReq):
+    try:
+        resultado = LeituraService.calculo_amor(compatibilidade_req.data_nascimento1, compatibilidade_req.data_nascimento2)
+        cartomante_interacao = bot.leitura_compatibilidade_interacao(resultado, compatibilidade_req.tipo_compatibilidade)
+        cartomante_futuro = bot.leitura_compatibilidade_futuro(resultado, compatibilidade_req.tipo_compatibilidade)
+    except ValueError as ve:
+        return {"status": "error", "message": str(ve)}
+
+    return {"status": "ok", "lista_arcanos": [arcano.to_dict() for arcano in resultado], "interacao": cartomante_interacao, "futuro": cartomante_futuro}

@@ -1,9 +1,9 @@
-import { TarotCard } from "@/data/tarotCards";
+import { ArcanoMaior } from "@/model/arcanoMaior";
 
 interface SynthesisCardProps {
-  arcanum1: TarotCard;
-  arcanum2: TarotCard;
-  synthesis: TarotCard;
+  arcanum1: ArcanoMaior;
+  arcanum2: ArcanoMaior;
+  synthesis: ArcanoMaior;
   name1: string;
   name2: string;
   interaction: string;
@@ -39,8 +39,8 @@ const SynthesisCard = ({
               Arcano de {name}
             </p>
             <div className="text-3xl mb-2">🌟</div>
-            <h3 className="font-heading text-sm text-accent mb-1">{card.name}</h3>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">{card.meaning}</p>
+            <h3 className="font-heading text-sm text-accent mb-1">{card.nome}</h3>
+            <p className="text-[10px] text-muted-foreground leading-relaxed">{card.jornada}</p>
           </div>
         ))}
       </div>
@@ -49,7 +49,7 @@ const SynthesisCard = ({
       <div className="flex flex-col items-center gap-2">
         <div className="w-px h-6 bg-gradient-to-b from-accent/50 to-accent/0" />
         <span className="text-xs text-accent font-heading">
-          {arcanum1.id} + {arcanum2.id} = {synthesis.id}
+          {arcanum1.numero} + {arcanum2.numero} = {synthesis.numero}
         </span>
         <div className="w-px h-6 bg-gradient-to-b from-accent/0 to-accent/50" />
       </div>
@@ -61,9 +61,9 @@ const SynthesisCard = ({
             ✦ Arcano de Síntese ✦
           </p>
           <div className="text-5xl mb-3 animate-sparkle">✨</div>
-          <h3 className="font-heading text-xl text-accent mb-2">{synthesis.name}</h3>
+          <h3 className="font-heading text-xl text-accent mb-2">{synthesis.nome}</h3>
           <div className="flex flex-wrap justify-center gap-1 mb-3">
-            {synthesis.keywords.map((kw) => (
+            {synthesis.palavra_chave.split(",").map((kw) => (
               <span
                 key={kw}
                 className="text-[10px] text-lavender bg-primary/20 rounded-full px-2 py-0.5"
@@ -72,7 +72,7 @@ const SynthesisCard = ({
               </span>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">{synthesis.meaning}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{synthesis.jornada}</p>
         </div>
       </div>
 
@@ -87,7 +87,7 @@ const SynthesisCard = ({
       {/* Relationship reading */}
       <div className="rounded-xl border border-accent/20 bg-accent/5 p-6 backdrop-blur-sm">
         <h4 className="font-heading text-sm text-accent mb-3 text-center">
-          {relationIcon} O que {synthesis.name} revela sobre o futuro
+          {relationIcon} O que {synthesis.nome} revela sobre o futuro
         </h4>
         <p className="text-sm text-foreground/80 leading-relaxed text-center italic">
           "{reading}"

@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { getCompatibilityCards, TarotCard } from "@/data/tarotCards";
-import { calculatePersonalArcanum } from "@/utils/arcanum";
-import { calculateSynthesis, SynthesisResult } from "@/data/synthesisInterpretations";
+import { ResultadoSintese} from "@/data/synthesisInterpretations";
+import { ArcanoMaior } from "@/model/arcanoMaior";
 import SynthesisCard from "@/components/SynthesisCard";
 import StarField from "@/components/StarField";
 
@@ -12,32 +11,77 @@ const relationLabels: Record<RelationType, { label: string; icon: string }> = {
   amizade: { label: "Amizade", icon: "🤝" },
   familia: { label: "Familiar", icon: "🏠" },
 };
+const hoje = new Date().toISOString().split("T")[0];
+
+const dataEhValida = (data: string) => {
+  if (!data) {
+    return false;
+  }
+
+  const dataInformada = new Date(data + "T00:00:00");
+  const hoje = new Date();
+
+  hoje.setHours(0, 0, 0, 0);
+
+  if (Number.isNaN(dataInformada.getTime())) {
+    return false;
+  }
+
+  if (dataInformada > hoje) {
+    return false;
+  }
+
+  return true;
+};
 
 const Compatibility = () => {
-  const [name1, setName1] = useState("");
+  const [name1, setName1] = useState(localStorage.getItem("usuario") ? JSON.parse(localStorage.getItem("usuario")!).nome : "");
   const [name2, setName2] = useState("");
-  const [birth1, setBirth1] = useState("");
+  const [birth1, setBirth1] = useState(localStorage.getItem("usuario") ? JSON.parse(localStorage.getItem("usuario")!).dataNascimento : "");
   const [birth2, setBirth2] = useState("");
   const [relationType, setRelationType] = useState<RelationType>("amor");
   const [result, setResult] = useState<{
-    cards: TarotCard[];
-    percentage: number;
-    synthesis: SynthesisResult;
+    cartas: ArcanoMaior[];
+    sintese: ResultadoSintese;
   } | null>(null);
   const [isReading, setIsReading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!dataEhValida(birth1)) {
+      alert("A data da primeira pessoa é inválida ou está no futuro.");
+      return;
+    } 
+
+    if (!dataEhValida(birth2)) {
+        alert("A data da segunda pessoa é inválida ou está no futuro.");
+        return;
+    }
+
+
     setIsReading(true);
-    setTimeout(() => {
-      const cards = getCompatibilityCards(3);
-      const percentage = Math.floor(Math.random() * 40) + 60;
-      const arcNum1 = calculatePersonalArcanum(birth1);
-      const arcNum2 = calculatePersonalArcanum(birth2);
-      const synthesis = calculateSynthesis(arcNum1, arcNum2, relationType);
-      setResult({ cards, percentage, synthesis });
-      setIsReading(false);
-    }, 2000);
+
+    const resposta = await fetch("http://localhost:8000/api/compatibilidade", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({nome1: name1, nome2: name2, data_nascimento1: birth1, data_nascimento2: birth2, tipo_compatibilidade: relationType})
+      });
+      
+      const dados = await resposta.json()
+      if(resposta.ok){
+        const cartas  = dados.lista_arcanos;
+        const sintese = {
+          arcanoUm: cartas[0],
+          arcanoDois: cartas[1],
+          arcanoResultado: cartas[2],
+          interacao: dados.interacao,
+          leitura: dados.futuro,
+        };
+        setResult({ cartas, sintese });
+        setIsReading(false);
+      }
   };
 
   return (
@@ -71,6 +115,7 @@ const Compatibility = () => {
               <input
                 type="date"
                 value={birth1}
+                max={hoje}
                 onChange={(e) => setBirth1(e.target.value)}
                 required
                 className="w-full rounded-lg border border-border bg-muted/30 px-4 py-2.5 text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
@@ -97,6 +142,7 @@ const Compatibility = () => {
               <input
                 type="date"
                 value={birth2}
+                max={hoje}
                 onChange={(e) => setBirth2(e.target.value)}
                 required
                 className="w-full rounded-lg border border-border bg-muted/30 px-4 py-2.5 text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
@@ -142,20 +188,17 @@ const Compatibility = () => {
               <p className="text-muted-foreground text-sm">
                 {relationLabels[relationType].icon} Compatibilidade {relationLabels[relationType].label}
               </p>
-              <div className="mt-4 inline-flex items-center justify-center">
-                <span className="font-heading text-5xl text-gradient-gold">{result.percentage}%</span>
-              </div>
             </div>
 
             {/* Synthesis section */}
             <SynthesisCard
-              arcanum1={result.synthesis.arcanum1}
-              arcanum2={result.synthesis.arcanum2}
-              synthesis={result.synthesis.synthesis}
+              arcanum1={result.sintese.arcanoUm}
+              arcanum2={result.sintese.arcanoDois}
+              synthesis={result.sintese.arcanoResultado}
               name1={name1}
               name2={name2}
-              interaction={result.synthesis.interaction}
-              reading={result.synthesis.friendshipReading}
+              interaction={result.sintese.interacao}
+              reading={result.sintese.leitura}
               relationIcon={relationLabels[relationType].icon}
               relationLabel={relationLabels[relationType].label}
             />
@@ -165,25 +208,25 @@ const Compatibility = () => {
               Leitura da Relação
             </h3>
             <div className="grid md:grid-cols-3 gap-4">
-              {result.cards.map((card, i) => {
+              {result.cartas.map((carta, i) => {
                 const positions = ["Passado", "Presente", "Futuro"];
                 return (
                   <div
-                    key={card.id}
+                    key={carta.numero}
                     className="rounded-xl border border-border bg-card/50 p-6 text-center backdrop-blur-sm"
                     style={{ animationDelay: `${i * 200}ms` }}
                   >
                     <p className="text-xs text-muted-foreground mb-2">{positions[i]}</p>
                     <div className="text-3xl mb-2">🃏</div>
-                    <h3 className="font-heading text-accent mb-2">{card.name}</h3>
+                    <h3 className="font-heading text-accent mb-2">{carta.nome}</h3>
                     <div className="flex flex-wrap justify-center gap-1 mb-3">
-                      {card.keywords.map((kw) => (
+                      {carta.palavra_chave.split(",").map((kw) => (
                         <span key={kw} className="text-xs text-lavender bg-primary/10 rounded-full px-2 py-0.5">
                           {kw}
                         </span>
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground">{card.meaning}</p>
+                    <p className="text-xs text-muted-foreground">{carta.arquetipo}</p>
                   </div>
                 );
               })}
