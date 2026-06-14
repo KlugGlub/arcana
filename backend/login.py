@@ -47,7 +47,6 @@ def validar_email(email):
 
     return re.match(padrao, email) is not None
 
-
 def run_login():
     opc = None
 
@@ -108,45 +107,6 @@ Escolha uma opção:
                         usuario = None
 
         elif opc == 2:
-            usuario = Usuario(None, None, None, None)
-
-            usuario.nome = input("Informe o seu nome: ")
-            while True:
-                email = input("Informe seu email: ").strip()
-
-                if not validar_email(email):
-                    print("Email inválido. Tente novamente.")
-                    continue
-
-                try:
-                    if UsuarioDAO.procurar_por_email(email) is not None:
-                        print("Este e-mail já está cadastrado. Tente outro.")
-                        continue
-                except Exception as e:
-                    print(f"Erro ao verificar email: {e}")
-                    continue
-
-                usuario.email = email
-                break
-
-            senha = input("Informe a senha: ")
-            confirmacao_senha = input("Confirme a senha: ")
-
-            while senha != confirmacao_senha:
-                print("As senhas não coincidem. Tente novamente.")
-                senha = input("Informe a senha: ")
-                confirmacao_senha = input("Confirme a senha: ")
-
-            hashed_password = bcrypt.hashpw(
-                senha.encode("utf-8"),
-                bcrypt.gensalt()
-            )
-
-            usuario.senha = hashed_password.decode("utf-8")
-
-            data_nascimento = solicitar_data_nascimento()
-            usuario.dataNascimento = data_nascimento.strftime("%Y-%m-%d")
-
-            UsuarioDAO.criar(usuario)
+            
 
             print("Usuário cadastrado com sucesso!")

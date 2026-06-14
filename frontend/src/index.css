@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Raleway:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 270 30% 6%;
+    --foreground: 40 20% 92%;
+
+    --card: 270 25% 12%;
+    --card-foreground: 40 20% 92%;
+
+    --popover: 270 25% 12%;
+    --popover-foreground: 40 20% 92%;
+
+    --primary: 270 50% 35%;
+    --primary-foreground: 40 20% 95%;
+
+    --secondary: 240 40% 18%;
+    --secondary-foreground: 40 20% 92%;
+
+    --muted: 270 20% 18%;
+    --muted-foreground: 270 10% 55%;
+
+    --accent: 38 60% 50%;
+    --accent-foreground: 270 30% 8%;
+
+    --destructive: 345 80% 45%;
+    --destructive-foreground: 40 20% 95%;
+
+    --border: 270 20% 20%;
+    --input: 270 20% 20%;
+    --ring: 270 50% 40%;
+
+    --radius: 0.75rem;
+
+    --gold: 45 80% 55%;
+    --gold-foreground: 270 30% 8%;
+    --crimson: 345 80% 45%;
+    --lavender: 240 40% 70%;
+    --deep-navy: 240 50% 12%;
+
+    --sidebar-background: 270 30% 8%;
+    --sidebar-foreground: 40 20% 92%;
+    --sidebar-primary: 270 50% 35%;
+    --sidebar-primary-foreground: 40 20% 95%;
+    --sidebar-accent: 270 20% 18%;
+    --sidebar-accent-foreground: 40 20% 92%;
+    --sidebar-border: 270 20% 20%;
+    --sidebar-ring: 270 50% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground font-body;
+    background-color: hsl(270 30% 5%);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, hsl(280 50% 20% / 0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 30%, hsl(320 50% 18% / 0.4) 0%, transparent 55%),
+      radial-gradient(ellipse 70% 60% at 50% 80%, hsl(270 45% 15% / 0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 70% 70%, hsl(345 60% 20% / 0.3) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 10% 60%, hsl(260 40% 18% / 0.4) 0%, transparent 55%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(35 50% 60%), hsl(30 40% 75%), hsl(38 55% 58%));
+  }
+
+  .border-gold {
+    border-color: hsl(45 80% 55%);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 20px hsl(45 80% 55% / 0.2), 0 0 60px hsl(45 80% 55% / 0.1);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 30px hsl(270 50% 35% / 0.3), 0 0 80px hsl(270 50% 35% / 0.15);
+  }
+
+  .gradient-section {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      hsl(270 40% 10% / 0.5) 50%,
+      transparent 100%
+    );
+  }
+
+  .gradient-accent-bar {
+    background: linear-gradient(
+      90deg,
+      hsl(270 50% 35%),
+      hsl(345 80% 45%),
+      hsl(45 80% 55%)
+    );
+    height: 2px;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes card-flip {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(180deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}

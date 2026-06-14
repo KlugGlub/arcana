@@ -2,12 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Run main.py in external terminal",
-      "type": "python",
+      "name": "Debug FastAPI com Uvicorn",
+      "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/main.py",
-      "console": "externalTerminal",
-      "cwd": "${workspaceFolder}",
+      "module": "uvicorn",
+      "args": [
+        "main:app",
+        "--host",
+        "localhost",
+        "--port",
+        "8000"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
       "justMyCode": true
     }
   ]

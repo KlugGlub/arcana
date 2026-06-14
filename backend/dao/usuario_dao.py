@@ -8,7 +8,7 @@ class UsuarioDAO():
         cursor = conexao.cursor()
 
         sql = "INSERT INTO tb_usuarios (nome, email, data_nascimento, senha) VALUES (%s, %s, %s, %s)"
-        cursor.execute(sql, (usuario.nome, usuario.email, usuario.dataNascimento, usuario.senha))
+        cursor.execute(sql, (usuario.nome, usuario.email, usuario.data_nascimento, usuario.senha))
         conexao.commit()
         cursor.close()
         conexao.close()
@@ -26,7 +26,7 @@ class UsuarioDAO():
         conexao.close()
 
         if resultado:
-            return Usuario(id_usuario=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3])
+            return Usuario(id_usuario=resultado[0], nome=resultado[1], email=resultado[2], data_nascimento=resultado[3])
         return None
 
     @staticmethod
@@ -35,7 +35,7 @@ class UsuarioDAO():
         cursor = conexao.cursor()
 
         sql = "UPDATE tb_usuarios SET nome = %s, email = %s, data_nascimento = %s, senha = %s WHERE id = %s"
-        cursor.execute(sql, (usuario.nome, usuario.email, usuario.dataNascimento, usuario.senha, usuario.id))
+        cursor.execute(sql, (usuario.nome, usuario.email, usuario.data_nascimento, usuario.senha, usuario.id))
         conexao.commit()
         cursor.close()
         conexao.close()
@@ -63,6 +63,6 @@ class UsuarioDAO():
         conexao.close()
 
         if resultado:
-            return Usuario(id_usuario=resultado[0], nome=resultado[1], email=resultado[2], dataNascimento=resultado[3], senha=resultado[4])
+            return Usuario(id_usuario=resultado[0], nome=resultado[1], email=resultado[2], data_nascimento=resultado[3], senha=resultado[4])
         return None
 

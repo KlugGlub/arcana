@@ -31,3 +31,5 @@ urllib3==2.7.0
 websockets==16.0
 mysql-connector-python
 bcrypt
+fastapi
+uvicorn
